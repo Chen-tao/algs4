@@ -16,6 +16,9 @@
  *
  *   - see also GrayPicture.java for a grayscale version
  *
+ *   - should we add int getRGB(int x, int y) and settRGB(int x, int y, int argb)
+ *     for performance (to avoid creating of Color objects when important)?
+ *
  ******************************************************************************/
 
 package edu.princeton.cs.algs4;
@@ -83,7 +86,6 @@ public final class Picture implements ActionListener {
         this.height = height;
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         // set to TYPE_INT_ARGB to support transparency
-        filename = width + "-by-" + height;
     }
 
    /**
@@ -217,7 +219,8 @@ public final class Picture implements ActionListener {
             frame.setContentPane(getJLabel());
             // f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            frame.setTitle(filename);
+            if (filename == null) frame.setTitle(width + "-by-" + height);
+            else                  frame.setTitle(filename);
             frame.setResizable(false);
             frame.pack();
             frame.setVisible(true);
@@ -247,12 +250,12 @@ public final class Picture implements ActionListener {
 
     private void validateRowIndex(int row) {
         if (row < 0 || row >= height())
-            throw new IndexOutOfBoundsException("row index must be between 0 and " + (height() - 1) + ": " + row);
+            throw new IllegalArgumentException("row index must be between 0 and " + (height() - 1) + ": " + row);
     }
 
     private void validateColumnIndex(int col) {
         if (col < 0 || col >= width())
-            throw new IndexOutOfBoundsException("column index must be between 0 and " + (width() - 1) + ": " + col);
+            throw new IllegalArgumentException("column index must be between 0 and " + (width() - 1) + ": " + col);
     }
 
    /**
@@ -261,7 +264,7 @@ public final class Picture implements ActionListener {
      * @param col the column index
      * @param row the row index
      * @return the color of pixel ({@code col}, {@code row})
-     * @throws IndexOutOfBoundsException unless both {@code 0 <= col < width} and {@code 0 <= row < height}
+     * @throws IllegalArgumentException unless both {@code 0 <= col < width} and {@code 0 <= row < height}
      */
     public Color get(int col, int row) {
         validateColumnIndex(col);
@@ -276,7 +279,7 @@ public final class Picture implements ActionListener {
      * @param col the column index
      * @param row the row index
      * @param color the color
-     * @throws IndexOutOfBoundsException unless both {@code 0 <= col < width} and {@code 0 <= row < height}
+     * @throws IllegalArgumentException unless both {@code 0 <= col < width} and {@code 0 <= row < height}
      * @throws IllegalArgumentException if {@code color} is {@code null}
      */
     public void set(int col, int row, Color color) {
